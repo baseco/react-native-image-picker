@@ -4,6 +4,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <Photos/Photos.h>
 #import <PhotosUI/PhotosUI.h>
+#import "UIImage-Extensions.h"
 
 @import MobileCoreServices;
 
@@ -53,6 +54,10 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
         [self launchImagePicker:options callback:callback];
     });
 }
+
+CGFloat DegreesToRadians(CGFloat degrees) {return degrees * M_PI / 180;};
+CGFloat RadiansToDegrees(CGFloat radians) {return radians * 180/M_PI;};
+
 
 - (void)launchImagePicker:(NSDictionary *)options callback:(RCTResponseSenderBlock)callback
 {
@@ -118,6 +123,36 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
 
 #pragma mark - Helpers
 
+
+- (UIImage *)imageRotatedByDegrees:(CGFloat)degrees
+{
+   // calculate the size of the rotated view's containing box for our drawing space
+   UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.size.width, self.size.height)];
+   CGAffineTransform t = CGAffineTransformMakeRotation(DegreesToRadians(degrees));
+   rotatedViewBox.transform = t;
+   CGSize rotatedSize = rotatedViewBox.frame.size;
+   [rotatedViewBox release];
+   
+   // Create the bitmap context
+   UIGraphicsBeginImageContext(rotatedSize);
+   CGContextRef bitmap = UIGraphicsGetCurrentContext();
+   
+   // Move the origin to the middle of the image so we will rotate and scale around the center.
+   CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
+   
+   //   // Rotate the image context
+   CGContextRotateCTM(bitmap, DegreesToRadians(degrees));
+   
+   // Now, draw the rotated/scaled image into the context
+   CGContextScaleCTM(bitmap, 1.0, -1.0);
+   CGContextDrawImage(bitmap, CGRectMake(-self.size.width / 2, -self.size.height / 2, self.size.width, self.size.height), [self CGImage]);
+   
+   UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+   UIGraphicsEndImageContext();
+   return newImage;
+   
+}
+
 -(NSMutableDictionary *)mapImageToAsset:(UIImage *)image data:(NSData *)data phAsset:(PHAsset * _Nullable)phAsset {
     NSString *fileType = [ImagePickerUtils getFileType:data];
     
@@ -139,6 +174,48 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
                                                          scale: newImage.scale
                                                    orientation: UIImageOrientationUp];
     
+    
+    UIImage* rotatedImage = NULL
+    
+    
+    switch (newImage.imageOrientation){
+        case UIImageOrientationUp:
+            asset[@"orientation"] = @(0);
+            rotatedImage = [newImage imageRotatedByDegrees:90.0];
+            break;
+        case UIImageOrientationDown:
+            asset[@"orientation"] = @(1);
+            rotatedImage = [newImage imageRotatedByDegrees:90.0];
+            break;
+        case UIImageOrientationRight:
+            asset[@"orientation"] = @(2);
+            rotatedImage = [newImage imageRotatedByDegrees:90.0];
+            break;
+        case UIImageOrientationLeft:
+            asset[@"orientation"] = @(3);
+            rotatedImage = [newImage imageRotatedByDegrees:90.0];
+            break;
+        case UIImageOrientationUpMirrored:
+            asset[@"orientation"] = @(4);
+            rotatedImage = [newImage imageRotatedByDegrees:90.0];
+            break;
+        case UIImageOrientationDownMirrored:
+            asset[@"orientation"] = @(5);
+            rotatedImage = [newImage imageRotatedByDegrees:90.0];
+            break;
+        case UIImageOrientationLeftMirrored:
+            asset[@"orientation"] = @(6);
+            rotatedImage = [newImage imageRotatedByDegrees:90.0];
+            break;
+        case UIImageOrientationRightMirrored:
+            asset[@"orientation"] = @(7);
+            rotatedImage = [newImage imageRotatedByDegrees:90.0];
+            break;
+        default:
+            asset[@"orientation"] = @(8);
+    }
+    
+    
     if (![fileType isEqualToString:@"gif"]) {
         newImage = [ImagePickerUtils resizeImage:image
                                      maxWidth:[self.options[@"maxWidth"] floatValue]
@@ -148,9 +225,9 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
     float quality = [self.options[@"quality"] floatValue];
     if (![image isEqual:newImage] || (quality >= 0 && quality < 1)) {
         if ([fileType isEqualToString:@"jpg"]) {
-            data = UIImageJPEGRepresentation(cleanImage, quality);
+            data = UIImageJPEGRepresentation(rotatedImage, quality);
         } else if ([fileType isEqualToString:@"png"]) {
-            data = UIImagePNGRepresentation(cleanImage);
+            data = UIImagePNGRepresentation(rotatedImage);
         }
     }
     
@@ -184,37 +261,6 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
         asset[@"id"] = phAsset.localIdentifier;
         
         
-        
-        
-        
-        switch (cleanImage.imageOrientation){
-            case UIImageOrientationUp:
-                asset[@"orientation"] = @(0);
-                break;
-            case UIImageOrientationDown:
-                asset[@"orientation"] = @(1);
-                break;
-            case UIImageOrientationRight:
-                asset[@"orientation"] = @(2);
-                break;
-            case UIImageOrientationLeft:
-                asset[@"orientation"] = @(3);
-                break;
-            case UIImageOrientationUpMirrored:
-                asset[@"orientation"] = @(4);
-                break;
-            case UIImageOrientationDownMirrored:
-                asset[@"orientation"] = @(5);
-                break;
-            case UIImageOrientationLeftMirrored:
-                asset[@"orientation"] = @(6);
-                break;
-            case UIImageOrientationRightMirrored:
-                asset[@"orientation"] = @(7);
-                break;
-            default:
-                asset[@"orientation"] = @(8);
-        }
         // Add more extra data here ...
     }
     

@@ -205,7 +205,7 @@ public class Utils {
             File file = createFile(context, getFileTypeFromMime(mimeType));
             OutputStream os = context.getContentResolver().openOutputStream(Uri.fromFile(file));
             b.compress(getBitmapCompressFormat(mimeType), options.quality, os);
-            setOrientation(file, originalOrientation, context);
+            setOrientation(file, ExifInterface.ORIENTATION_NORMAL, context);
 
             deleteFile(uri);
 
