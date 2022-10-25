@@ -177,7 +177,7 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
     if(phAsset){
         asset[@"timestamp"] = [self getDateTimeInUTC:phAsset.creationDate];
         asset[@"id"] = phAsset.localIdentifier;
-        switch (image.orientation){
+        switch (image.imageOrientation){
             case UIImageOrientationUp:
                 asset[@"orientation"] = @(0)
                 break;
