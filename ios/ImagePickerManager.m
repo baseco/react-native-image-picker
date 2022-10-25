@@ -179,31 +179,31 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
         asset[@"id"] = phAsset.localIdentifier;
         switch (image.imageOrientation){
             case UIImageOrientationUp:
-                asset[@"orientation"] = @(0)
+                asset[@"orientation"] = @(0);
                 break;
             case UIImageOrientationDown:
-                asset[@"orientation"] = @(1)
+                asset[@"orientation"] = @(1);
                 break;
             case UIImageOrientationRight:
-                asset[@"orientation"] = @(2)
+                asset[@"orientation"] = @(2);
                 break;
             case UIImageOrientationLeft:
-                asset[@"orientation"] = @(3)
+                asset[@"orientation"] = @(3);
                 break;
             case UIImageOrientationUpMirrored:
-                asset[@"orientation"] = @(4)
+                asset[@"orientation"] = @(4);
                 break;
             case UIImageOrientationDownMirrored:
-                asset[@"orientation"] = @(5)
+                asset[@"orientation"] = @(5);
                 break;
             case UIImageOrientationLeftMirrored:
-                asset[@"orientation"] = @(6)
+                asset[@"orientation"] = @(6);
                 break;
             case UIImageOrientationRightMirrored:
-                asset[@"orientation"] = @(7)
+                asset[@"orientation"] = @(7);
                 break;
             default:
-                asset[@"orientation"] = @(8)
+                asset[@"orientation"] = @(8);
         }
         // Add more extra data here ...
     }
