@@ -134,6 +134,11 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
     }
     
     UIImage* newImage = image;
+    
+    UIImage* cleanImage = [[UIImage alloc] initWithCGImage: newImage.CGImage
+                                                         scale: newImage.scale
+                                                   orientation: UIImageOrientationRight];
+    
     if (![fileType isEqualToString:@"gif"]) {
         newImage = [ImagePickerUtils resizeImage:image
                                      maxWidth:[self.options[@"maxWidth"] floatValue]
@@ -143,9 +148,9 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
     float quality = [self.options[@"quality"] floatValue];
     if (![image isEqual:newImage] || (quality >= 0 && quality < 1)) {
         if ([fileType isEqualToString:@"jpg"]) {
-            data = UIImageJPEGRepresentation(newImage, quality);
+            data = UIImageJPEGRepresentation(cleanImage, quality);
         } else if ([fileType isEqualToString:@"png"]) {
-            data = UIImagePNGRepresentation(newImage);
+            data = UIImagePNGRepresentation(cleanImage);
         }
     }
     
@@ -171,13 +176,18 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
     }
 
     asset[@"fileName"] = fileName;
-    asset[@"width"] = @(newImage.size.width);
-    asset[@"height"] = @(newImage.size.height);
+    asset[@"width"] = @(cleanImage.size.width);
+    asset[@"height"] = @(cleanImage.size.height);
     
     if(phAsset){
         asset[@"timestamp"] = [self getDateTimeInUTC:phAsset.creationDate];
         asset[@"id"] = phAsset.localIdentifier;
-        switch (image.imageOrientation){
+        
+        
+        
+        
+        
+        switch (cleanImage.imageOrientation){
             case UIImageOrientationUp:
                 asset[@"orientation"] = @(0);
                 break;
