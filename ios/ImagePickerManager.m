@@ -137,7 +137,7 @@ RCT_EXPORT_METHOD(launchImageLibrary:(NSDictionary *)options callback:(RCTRespon
     
     UIImage* cleanImage = [[UIImage alloc] initWithCGImage: newImage.CGImage
                                                          scale: newImage.scale
-                                                   orientation: UIImageOrientationRight];
+                                                   orientation: UIImageOrientationUp];
     
     if (![fileType isEqualToString:@"gif"]) {
         newImage = [ImagePickerUtils resizeImage:image
