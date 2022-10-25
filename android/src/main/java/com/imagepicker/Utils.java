@@ -413,7 +413,11 @@ public class Utils {
           // Add more extra data here ...
           map.putString("timestamp", imageMetadata.getDateTime());
           map.putString("id", fileName);
-        map.putString("orientation", getOrientation(uri, context));
+          try {
+            map.putString("orientation", getOrientation(uri, context));
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
         }
 
         return map;
